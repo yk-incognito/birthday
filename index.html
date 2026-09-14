@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Quest Special 🎂</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Floating Audio Player -->
+  <div class="music-control" id="musicBtn" title="Play/Pause Music">🎵</div>
+  <audio id="bgMusic" loop>
+    <!-- Replace with your audio file or link -->
+    <source src="assets/music/bgm.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Quest Progress Bar -->
+  <header class="tracker-bar">
+    <div class="tracker-info">
+      <span id="currentLevelText">Level 0 of 5</span>
+    </div>
+    <div class="progress-line-container">
+      <div class="progress-line-fill" id="progressFill"></div>
+    </div>
+  </header>
+
+  <main class="quest-container">
+
+    <!-- LEVEL 0: WELCOME SCREEN -->
+    <section class="screen active" id="screen0">
+      <div class="card glass-card">
+        <div class="avatar-ring">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Birthday Person" class="hero-img" id="heroPhoto" />
+        </div>
+        <h1 class="glow-title">Happy Birthday! 🎉</h1>
+        <p class="sub-lead">ഇന്നത്തെ ദിവസത്തിന് നിനക്കായി ഒരു പ്രത്യേക സർപ്രൈസ് ഒരുക്കിവെച്ചിട്ടുണ്ട്. അത് തുറക്കാൻ 5 രസകരമായ ലെവലുകൾ പൂർത്തിയാക്കണം!</p>
+        <button class="primary-btn pulse" onclick="startQuest()">Start The Quest 🚀</button>
+      </div>
+    </section>
+
+    <!-- LEVEL 1: NOSTALGIA QUIZ -->
+    <section class="screen" id="screen1">
+      <div class="card glass-card">
+        <span class="badge">Level 1: The Memory Test 🧠</span>
+        <h2 class="prompt-title">നമ്മളെപ്പറ്റി ഒരു ചോദ്യം!</h2>
+        <p class="q-text">നമ്മൾ ഒരുമിച്ച് ഉണ്ടാക്കിയതിൽ വെച്ച് ഏറ്റവും മറക്കാനാവാത്ത മെമ്മറി എന്താണ്?</p>
+        
+        <div class="quiz-options">
+          <button class="choice-btn" onclick="handleQuizAnswer(true)">ആ അടിപൊളി ട്രിപ്പും രാത്രിയിലെ തമാശകളും 🚗</button>
+          <button class="choice-btn" onclick="handleQuizAnswer(true)">ഒരു കാര്യവുമില്ലാതെ ചിരിച്ച് മണ്ണുകപ്പിയ ദിനങ്ങൾ 😂</button>
+          <button class="choice-btn" onclick="handleQuizAnswer(true)">എല്ലാ ദിവസവും ഒപ്പമുള്ള ഓരോ കൊച്ചു നിമിഷങ്ങളും ✨</button>
+        </div>
+        <div class="feedback-box" id="quizFeedback"></div>
+      </div>
+    </section>
+
+    <!-- LEVEL 2: 3x3 PHOTO PUZZLE -->
+    <section class="screen" id="screen2">
+      <div class="card glass-card">
+        <span class="badge">Level 2: Memory Puzzle 🧩</span>
+        <h2 class="prompt-title">പീസ് കൂട്ടി യോജിപ്പിക്കൂ!</h2>
+        <p class="instruction">ബോക്സുകളിൽ ടാപ്പ് ചെയ്ത് ശരിയായ സ്ഥാനത്തേക്ക് മാറ്റുക.</p>
+        
+        <div class="puzzle-wrapper">
+          <div class="puzzle-board" id="puzzleBoard"></div>
+        </div>
+        <p class="puzzle-status" id="puzzleStatus">തുടങ്ങാൻ കഷ്ണങ്ങൾ ശരിയാക്കൂ...</p>
+        <button class="primary-btn hidden" id="puzzleNextBtn" onclick="goToLevel(3)">Next Level ➡️</button>
+      </div>
+    </section>
+
+    <!-- LEVEL 3: RUNAWAY 'NO' BUTTON -->
+    <section class="screen" id="screen3">
+      <div class="card glass-card playground">
+        <span class="badge">Level 3: The Truth Chamber ⚖️</span>
+        <h2 class="prompt-title">സത്യം മാത്രം പറയുക!</h2>
+        <p class="trap-question">"ഈ ലോകത്തിലെ ഏറ്റവും അടിപൊളി സുഹൃത്ത് ഞാനാണെന്ന് നീ പൂർണ്ണമായും സമ്മതിക്കുന്നുണ്ടോ?"</p>
+        
+        <div class="action-buttons" id="trapBox">
+          <button class="primary-btn win-btn" id="yesBtn" onclick="handleYesTrap()">YES! 100% 😍</button>
+          <button class="run-btn danger-btn" id="noBtn">NO 😜</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEVEL 4: SCRATCH CARD & CIPHER -->
+    <section class="screen" id="screen4">
+      <div class="card glass-card">
+        <span class="badge">Level 4: Crack The Vault 🔐</span>
+        <h2 class="prompt-title">രഹസ്യ കോഡ് കണ്ടുപിടിക്കൂ!</h2>
+        <p>താഴെയുള്ള കാർഡ് വിരൽ കൊണ്ടോ മൗസ് കൊണ്ടോ സ്ക്രാച്ച് ചെയ്യുക:</p>
+
+        <div class="scratch-wrapper">
+          <div class="scratch-reveal" id="scratchReveal">CODE: <strong>BDAY2026</strong></div>
+          <canvas id="scratchCanvas" width="280" height="110"></canvas>
+        </div>
+
+        <div class="code-verify-box">
+          <input type="text" id="secretInput" placeholder="Enter Secret Code" autocomplete="off" />
+          <button class="primary-btn" onclick="verifySecretCode()">Unlock Door 🔓</button>
+        </div>
+        <p class="error-text" id="codeError"></p>
+      </div>
+    </section>
+
+    <!-- LEVEL 5: GRAND FINALE -->
+    <section class="screen" id="screen5">
+      <div class="card glass-card finale-card">
+        <span class="badge gold-badge">Level 5: The Grand Treasure 🎁</span>
+        <h1 class="glow-title">Happy Birthday! 🎂</h1>
+        
+        <!-- Interactive Cake -->
+        <div class="cake-area" onclick="blowCandle()">
+          <div class="candle" id="candle">
+            <div class="flame" id="flame"></div>
+          </div>
+          <div class="cake-tier"></div>
+          <p class="cake-hint" id="cakeHint">മെഴുകുതിരിയിൽ ക്ലിക്ക് ചെയ്ത് ഊതുക! 🕯️</p>
+        </div>
+
+        <!-- Personal Note -->
+        <div class="heartfelt-letter">
+          <h3>പ്രിയപ്പെട്ട സുഹൃത്തിന്, ✨</h3>
+          <p>
+            ജീവിതത്തിൽ എപ്പോഴും കൂടെ നിൽക്കുന്നതിനും, എല്ലാ തമാശകളിലും പ്രതിസന്ധികളിലും ഒപ്പം നിന്നതിനും ഒരായിരം നന്ദി.
+            വരുന്ന വർഷം സന്തോഷവും സമാധാനവും വലിയ വിജയങ്ങളും നിറഞ്ഞതാകട്ടെ. Keep smiling always!
+          </p>
+        </div>
+
+        <!-- Polaroid Photo Wall -->
+        <h3 class="gallery-title">Golden Memories 📸</h3>
+        <div class="polaroid-grid">
+          <div class="polaroid">
+            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=400&q=80" alt="Memory 1" />
+            <span>Unforgettable Smiles</span>
+          </div>
+          <div class="polaroid">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" alt="Memory 2" />
+            <span>Forever Crazy Squad</span>
+          </div>
+          <div class="polaroid">
+            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400&q=80" alt="Memory 3" />
+            <span>Endless Celebrations</span>
+          </div>
+        </div>
+
+        <button class="primary-btn restart-btn" onclick="celebrateAgain()">Celebrate Again 🎆</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
