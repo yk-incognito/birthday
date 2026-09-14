@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday! 🎉</title>
+
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Sacramento&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Floating Balloons Effect */
+    .balloon {
+      position: fixed;
+      bottom: -100px;
+      width: 40px;
+      height: 55px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      opacity: 0.7;
+      animation: floatUp 8s infinite linear;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .title {
+      font-family: 'Sacramento', cursive;
+      font-size: 3.5rem;
+      color: #ff758c;
+      text-shadow: 0 0 15px rgba(255, 117, 140, 0.6);
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #e0e0e0;
+      margin-bottom: 25px;
+      font-weight: 300;
+    }
+
+    /* Photo Frame */
+    .photo-container {
+      width: 170px;
+      height: 170px;
+      margin: 0 auto 25px;
+      border-radius: 50%;
+      padding: 5px;
+      background: linear-gradient(45deg, #ff758c, #ff7eb3, #ffd166);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      animation: pulse 3s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    .photo-container img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+    }
+
+    /* Interactive Cake */
+    .cake-box {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 25px 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .cake-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      margin: 15px 0;
+    }
+
+    .cake-icon {
+      font-size: 80px;
+      user-select: none;
+      display: block;
+    }
+
+    .candle-flame {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 22px;
+      background: radial-gradient(ellipse at bottom, #ffe600 0%, #ff5722 70%);
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 15px #ff9800;
+      animation: flicker 0.6s infinite alternate ease-in-out;
+      transition: all 0.4s ease;
+    }
+
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+      100% { transform: translateX(-50%) scale(1.15) rotate(2deg); }
+    }
+
+    .candle-flame.blown {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.2);
+    }
+
+    .tap-hint {
+      font-size: 0.85rem;
+      color: #ffd166;
+      margin-top: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Wish Card */
+    .wish-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: #eaeaea;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Surprise Gift Button & Box */
+    .gift-btn {
+      background: linear-gradient(45deg, #ff758c, #ff7eb3);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+    }
+
+    .gift-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba(255, 117, 140, 0.6);
+    }
+
+    #surprise-content {
+      display: none;
+      background: rgba(255, 215, 0, 0.15);
+      border: 1px solid #ffd166;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 15px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10deg); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Music Control -->
+  <button class="music-btn" onclick="toggleMusic()" id="musicBtn">🎵 Music Off</button>
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=happy-birthday-to-you-piano-version-13976.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Background Balloons -->
+  <div class="balloon" style="left: 10%; background: #ff758c; animation-delay: 0s;"></div>
+  <div class="balloon" style="left: 30%; background: #ffd166; animation-delay: 2s;"></div>
+  <div class="balloon" style="left: 70%; background: #06d6a0; animation-delay: 4s;"></div>
+  <div class="balloon" style="left: 85%; background: #118ab2; animation-delay: 1s;"></div>
+
+  <div class="container">
+    <h1 class="title">Happy Birthday!</h1>
+    <!-- ഇവിടെ പേര് മാറ്റാം -->
+    <p class="subtitle">Dear <span style="color: #ffd166; font-weight: 600;">[Name]</span> ❤️</p>
+
+    <!-- Photo Container -->
+    <div class="photo-container">
+      <!-- ഇവിടെ നിങ്ങളുടെ ഫോട്ടോ ഫയലിന്റെ പേര് നൽകുക (ഉദാ: image.jpg) -->
+      <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=400&q=80" alt="Birthday Friend" id="profileImg" />
+    </div>
+
+    <!-- Interactive Cake Section -->
+    <div class="cake-box">
+      <div class="cake-wrapper" onclick="blowCandle()">
+        <div class="candle-flame" id="flame"></div>
+        <div class="cake-icon">🎂</div>
+      </div>
+      <p class="tap-hint" id="statusText">✨ മെഴുകുതിരിയിൽ ക്ലിക്ക് ചെയ്ത് ഊതിക്കെടുത്തൂ! ✨</p>
+    </div>
+
+    <!-- Message Card -->
+    <div class="wish-box">
+      <!-- നിങ്ങളുടെ സ്വന്തം ആശംസ ഇവിടെ ടൈപ്പ് ചെയ്യാം -->
+      <p>
+        ജീവിതത്തിലെ എല്ലാ സന്തോഷങ്ങളും വിജയങ്ങളും ആയുരാരോഗ്യങ്ങളും നിറഞ്ഞ മറ്റൊരു നല്ല വർഷം കൂടി ആശംസിക്കുന്നു! 
+        ഈ വർഷം നിന്റെ എല്ലാ ആഗ്രഹങ്ങളും സഫലമാകട്ടെ. ഹൃദയം നിറഞ്ഞ ജന്മദിനാശംസകൾ! ✨
+      </p>
+    </div>
+
+    <!-- Interactive Surprise Button -->
+    <button class="gift-btn" onclick="openSurprise()">🎁 ഒരു സർപ്രൈസ് കാണണോ?</button>
+
+    <div id="surprise-content">
+      <h3>🎉 സർപ്രൈസ്! 🎉</h3>
+      <p style="margin-top: 8px; font-size: 0.95rem;">
+        "നല്ലൊരു കൂട്ടുകാരനായി/കൂട്ടുകാരിയായി കൂടെയുള്ളതിന് ഒരുപാട് നന്ദി. Always keep smiling!" 😊✨
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // പേജ് ലോഡാകുമ്പോൾ തനിയെ confetti പൊട്ടാൻ
+    window.addEventListener('load', () => {
+      triggerConfetti();
+    });
+
+    function triggerConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    // Candle Blowing Logic
+    let candleBlown = false;
+    function blowCandle() {
+      if (!candleBlown) {
+        document.getElementById('flame').classList.add('blown');
+        document.getElementById('statusText').innerText = "🎉 Yay! Wish Made! Happy Birthday! 🥳";
+        
+        // വലിയ തോതിൽ പൂത്തിരി പൊട്ടിക്കുന്നു
+        confetti({
+          particleCount: 200,
+          spread: 100,
+          origin: { y: 0.5 }
+        });
+
+        candleBlown = true;
+      }
+    }
+
+    // Open Surprise Logic
+    function openSurprise() {
+      const content = document.getElementById('surprise-content');
+      content.style.display = 'block';
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.8 }
+      });
+    }
+
+    // Music Play/Pause
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
+    let isPlaying = false;
+
+    function toggleMusic() {
+      if (isPlaying) {
+        music.pause();
+        musicBtn.innerText = "🎵 Music Off";
+      } else {
+        music.play();
+        musicBtn.innerText = "🔊 Music On";
+      }
+      isPlaying = !isPlaying;
+    }
+  </script>
+</body>
+</html>
