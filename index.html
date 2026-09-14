@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Birthday Quest Special 🎂</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Confetti Library -->
+  <!-- Confetti Animation Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
   <!-- Floating Audio Player -->
   <div class="music-control" id="musicBtn" title="Play/Pause Music">🎵</div>
-  <audio id="bgMusic" loop>
-    <!-- Replace with your audio file or link -->
-    <source src="assets/music/bgm.mp3" type="audio/mpeg" />
+  <audio id="bgMusic" loop autoplay preload="auto">
+    <source src="vgm.mp3" type="audio/mpeg" />
   </audio>
 
-  <!-- Quest Progress Bar -->
+  <!-- Quest Progress Header -->
   <header class="tracker-bar">
     <div class="tracker-info">
       <span id="currentLevelText">Level 0 of 5</span>
@@ -37,7 +36,7 @@
         </div>
         <h1 class="glow-title">Happy Birthday! 🎉</h1>
         <p class="sub-lead">ഇന്നത്തെ ദിവസത്തിന് നിനക്കായി ഒരു പ്രത്യേക സർപ്രൈസ് ഒരുക്കിവെച്ചിട്ടുണ്ട്. അത് തുറക്കാൻ 5 രസകരമായ ലെവലുകൾ പൂർത്തിയാക്കണം!</p>
-        <button class="primary-btn pulse" onclick="startQuest()">Start The Quest 🚀</button>
+        <button class="primary-btn pulse" onclick="goToLevel(1)">Start The Quest 🚀</button>
       </div>
     </section>
 
@@ -57,22 +56,36 @@
       </div>
     </section>
 
-    <!-- LEVEL 2: 3x3 PHOTO PUZZLE -->
+    <!-- LEVEL 2: 3x3 PHOTO PUZZLE WITH TIMER & SKIP/EXTRA TIME -->
     <section class="screen" id="screen2">
       <div class="card glass-card">
         <span class="badge">Level 2: Memory Puzzle 🧩</span>
         <h2 class="prompt-title">പീസ് കൂട്ടി യോജിപ്പിക്കൂ!</h2>
-        <p class="instruction">ബോക്സുകളിൽ ടാപ്പ് ചെയ്ത് ശരിയായ സ്ഥാനത്തേക്ക് മാറ്റുക.</p>
+        
+        <!-- Timer Display -->
+        <div class="timer-badge" id="puzzleTimer">⏳ സമയം: 45s</div>
         
         <div class="puzzle-wrapper">
           <div class="puzzle-board" id="puzzleBoard"></div>
         </div>
-        <p class="puzzle-status" id="puzzleStatus">തുടങ്ങാൻ കഷ്ണങ്ങൾ ശരിയാക്കൂ...</p>
+
+        <p class="puzzle-status" id="puzzleStatus">കഷ്ണങ്ങളിൽ ക്ലിക്ക് ചെയ്ത് ശരിയായ സ്ഥാനത്തേക്ക് മാറ്റുക</p>
+        
+        <!-- TIME UP TROLL POPUP -->
+        <div id="timeUpOptions" class="hidden timeup-box">
+          <p class="troll-msg">ഇതുവരെ തീർത്തില്ലേ മടിയാ? 😜</p>
+          <div class="troll-btn-group">
+            <button class="choice-btn-small" onclick="giveExtraTime()">ഒന്നുകൂടി ട്രൈ ചെയ്യണോ? (+1 Min) ⏱️</button>
+            <button class="choice-btn-small secondary-choice" onclick="autoSolvePuzzle()">ഞാൻ ശരിയാക്കി തരട്ടെ? 🪄</button>
+          </div>
+        </div>
+
+        <!-- Next Step Button -->
         <button class="primary-btn hidden" id="puzzleNextBtn" onclick="goToLevel(3)">Next Level ➡️</button>
       </div>
     </section>
 
-    <!-- LEVEL 3: RUNAWAY 'NO' BUTTON -->
+    <!-- LEVEL 3: RUNAWAY 'NO' BUTTON TRAP -->
     <section class="screen" id="screen3">
       <div class="card glass-card playground">
         <span class="badge">Level 3: The Truth Chamber ⚖️</span>
@@ -91,7 +104,7 @@
       <div class="card glass-card">
         <span class="badge">Level 4: Crack The Vault 🔐</span>
         <h2 class="prompt-title">രഹസ്യ കോഡ് കണ്ടുപിടിക്കൂ!</h2>
-        <p>താഴെയുള്ള കാർഡ് വിരൽ കൊണ്ടോ മൗസ് കൊണ്ടോ സ്ക്രാച്ച് ചെയ്യുക:</p>
+        <p class="sub-lead">താഴെയുള്ള കാർഡ് വിരൽ കൊണ്ടോ മൗസ് കൊണ്ടോ സ്ക്രാച്ച് ചെയ്യുക:</p>
 
         <div class="scratch-wrapper">
           <div class="scratch-reveal" id="scratchReveal">CODE: <strong>BDAY2026</strong></div>
@@ -121,7 +134,7 @@
           <p class="cake-hint" id="cakeHint">മെഴുകുതിരിയിൽ ക്ലിക്ക് ചെയ്ത് ഊതുക! 🕯️</p>
         </div>
 
-        <!-- Personal Note -->
+        <!-- Personal Friendship Note -->
         <div class="heartfelt-letter">
           <h3>പ്രിയപ്പെട്ട സുഹൃത്തിന്, ✨</h3>
           <p>
@@ -130,7 +143,7 @@
           </p>
         </div>
 
-        <!-- Polaroid Photo Wall -->
+        <!-- Polaroid Memories -->
         <h3 class="gallery-title">Golden Memories 📸</h3>
         <div class="polaroid-grid">
           <div class="polaroid">
