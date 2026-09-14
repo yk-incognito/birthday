@@ -2,12 +2,55 @@
 let currentLevel = 0;
 const totalLevels = 5;
 
-/* 1. AUTO-START AUDIO CONTROLLER */
+/* 1. AUTO-START AUDIO CONTROLLER 
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+let isPlaying = false;   */
+
+
+/* AUDIO CONTROLLER */
 const bgMusic = document.getElementById("bgMusic");
 const musicBtn = document.getElementById("musicBtn");
 let isPlaying = false;
 
 function playAudio() {
+  if (bgMusic && !isPlaying) {
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      musicBtn.classList.add("playing");
+    }).catch(err => {
+      console.log("Autoplay was blocked by browser. Waiting for interaction:", err);
+    });
+  }
+}
+
+function toggleMusic() {
+  if (!bgMusic) return;
+  if (isPlaying) {
+    bgMusic.pause();
+    musicBtn.classList.remove("playing");
+    isPlaying = false;
+  } else {
+    playAudio();
+  }
+}
+
+musicBtn.addEventListener("click", toggleMusic);
+
+// 1. പേജ് ലോഡ് ആകുമ്പോൾ തന്നെ പ്ലേ ചെയ്യാൻ ട്രൈ ചെയ്യുന്നു:
+window.addEventListener("DOMContentLoaded", () => {
+  playAudio();
+});
+
+// 2. ബ്രൗസർ തടഞ്ഞാൽ, യൂസർ സ്ക്രീനിൽ ആദ്യമായി എവിടെയെങ്കിലും ഒരു തവണ തൊടുമ്പോൾ ഉടൻ പാട്ട് സ്റ്റാർട്ട് ആകും:
+["click", "touchstart", "keydown"].forEach(event => {
+  document.addEventListener(event, function startOnFirstGesture() {
+    playAudio();
+    // ഒറ്റത്തവണ വർക്ക് ചെയ്താൽ ലിസണർ റിമൂവ് ചെയ്യും
+    document.removeEventListener(event, startOnFirstGesture);
+  }, { once: true });
+});
+/* function playAudio() {
   if (!isPlaying && bgMusic) {
     bgMusic.play().then(() => {
       isPlaying = true;
@@ -39,7 +82,7 @@ window.addEventListener("load", () => {
 document.body.addEventListener("click", function initOnFirstClick() {
   playAudio();
   document.body.removeEventListener("click", initOnFirstClick);
-}, { once: true });
+}, { once: true });                */
 
 /* NAVIGATION CONTROLLER */
 function updateProgress(lvl) {
