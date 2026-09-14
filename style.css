@@ -83,7 +83,7 @@ body {
   transition: width 0.4s ease;
 }
 
-/* Screens & Glass Card */
+/* Containers */
 .quest-container {
   width: 100%;
   max-width: 520px;
@@ -174,7 +174,7 @@ body {
   margin-bottom: 24px;
 }
 
-/* Common Buttons */
+/* Primary Action Buttons */
 .primary-btn {
   background: var(--primary-gradient);
   border: none;
@@ -235,10 +235,22 @@ body {
 }
 
 /* Puzzle 3x3 */
+.timer-badge {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--accent-gold);
+  background: rgba(251, 191, 36, 0.15);
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
 .puzzle-wrapper {
   display: flex;
   justify-content: center;
-  margin: 16px 0;
+  margin: 10px 0;
 }
 
 .puzzle-board {
@@ -272,7 +284,53 @@ body {
 .puzzle-status {
   font-size: 0.85rem;
   color: var(--text-muted);
+  margin-top: 10px;
   margin-bottom: 12px;
+}
+
+/* Time Up Troll Box */
+.timeup-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px dashed #f43f5e;
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.troll-msg {
+  color: #fb7185;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.troll-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.choice-btn-small {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.choice-btn-small:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.secondary-choice {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.5);
+  color: #fecdd3;
 }
 
 /* Runaway Trap */
@@ -281,11 +339,16 @@ body {
   min-height: 380px;
 }
 
+.trap-question {
+  margin: 12px 0 20px;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
 .action-buttons {
   position: relative;
   height: 200px;
   width: 100%;
-  margin-top: 20px;
 }
 
 .win-btn {
@@ -428,6 +491,11 @@ body {
   margin: 18px 0;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+.gallery-title {
+  margin: 18px 0 12px;
+  font-size: 1.1rem;
 }
 
 .polaroid-grid {
