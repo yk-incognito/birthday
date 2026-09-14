@@ -2,23 +2,44 @@
 let currentLevel = 0;
 const totalLevels = 5;
 
-/* 1. AUDIO CONTROLLER */
+/* 1. AUTO-START AUDIO CONTROLLER */
 const bgMusic = document.getElementById("bgMusic");
 const musicBtn = document.getElementById("musicBtn");
 let isPlaying = false;
+
+function playAudio() {
+  if (!isPlaying && bgMusic) {
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      musicBtn.classList.add("playing");
+    }).catch(err => {
+      console.log("Autoplay waiting for first touch/interaction:", err);
+    });
+  }
+}
 
 function toggleMusic() {
   if (isPlaying) {
     bgMusic.pause();
     musicBtn.classList.remove("playing");
+    isPlaying = false;
   } else {
-    bgMusic.play().catch(() => {});
-    musicBtn.classList.add("playing");
+    playAudio();
   }
-  isPlaying = !isPlaying;
 }
 
 musicBtn.addEventListener("click", toggleMusic);
+
+// പേജ് ലോഡ് ആകുമ്പോൾ തന്നെ സ്വയം പ്ലേ ആക്കാൻ ശ്രമിക്കുന്നു:
+window.addEventListener("load", () => {
+  playAudio();
+});
+
+// ബ്രൗസർ ഓട്ടോപ്ലേ തടഞ്ഞാൽ, സ്ക്രീനിൽ ആദ്യമായി എവിടെയെങ്കിലും ഒരു തവണ തൊടുമ്പോൾ ഉടൻ പാട്ട് പ്ലേ ആകും:
+document.body.addEventListener("click", function initOnFirstClick() {
+  playAudio();
+  document.body.removeEventListener("click", initOnFirstClick);
+}, { once: true });
 
 /* NAVIGATION CONTROLLER */
 function updateProgress(lvl) {
@@ -29,6 +50,11 @@ function updateProgress(lvl) {
 }
 
 function goToLevel(lvl) {
+  // പസിൽ ടൈമർ ഓടുന്നുണ്ടെങ്കിൽ ക്ലിയർ ചെയ്യാൻ
+  if (lvl !== 2 && puzzleTimerInterval) {
+    clearInterval(puzzleTimerInterval);
+  }
+
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const target = document.getElementById(`screen${lvl}`);
   if (target) target.classList.add("active");
@@ -38,33 +64,81 @@ function goToLevel(lvl) {
   if (lvl === 4) initScratchCard();
 }
 
-function startQuest() {
-  // Start music on user interaction
-  if (!isPlaying) toggleMusic();
-  goToLevel(1);
-}
-
 /* 2. LEVEL 1: NOSTALGIA QUIZ */
 function handleQuizAnswer(isCorrect) {
   const feedback = document.getElementById("quizFeedback");
   if (isCorrect) {
     feedback.innerText = "അടിപൊളി! നിനക്ക് ഇതെല്ലാം ഓർമ്മയുണ്ട് അല്ലേ? ❤️";
     triggerConfetti();
-    setTimeout(() => goToLevel(2), 1500);
+    setTimeout(() => goToLevel(2), 1200);
   }
 }
 
-/* 3. LEVEL 2: 3x3 SLIDING PHOTO PUZZLE */
+/* 3. LEVEL 2: 3x3 PHOTO PUZZLE & TROLL OPTIONS */
 let board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const winningBoard = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+let puzzleTimerInterval = null;
+let timeLeft = 45;
+let puzzleSolved = false;
 
 function initPuzzle() {
-  // Shuffle puzzle solvably
+  puzzleSolved = false;
+  timeLeft = 45;
+  document.getElementById("timeUpOptions").classList.add("hidden");
+  document.getElementById("puzzleNextBtn").classList.add("hidden");
+  document.getElementById("puzzleStatus").innerText = "കഷ്ണങ്ങളിൽ ക്ലിക്ക് ചെയ്ത് ശരിയായ സ്ഥാനത്തേക്ക് മാറ്റുക";
+  
+  // ഷഫിൾ ചെയ്യുന്നു
   board = [1, 2, 0, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
   renderPuzzle();
+  startPuzzleTimer();
 }
 
-function renderPuzzle() {
+function startPuzzleTimer() {
+  if (puzzleTimerInterval) clearInterval(puzzleTimerInterval);
+  
+  const timerDisplay = document.getElementById("puzzleTimer");
+  timerDisplay.innerText = `⏳ സമയം: ${timeLeft}s`;
+
+  puzzleTimerInterval = setInterval(() => {
+    timeLeft--;
+    timerDisplay.innerText = `⏳ സമയം: ${timeLeft}s`;
+
+    if (timeLeft <= 0) {
+      clearInterval(puzzleTimerInterval);
+      if (!puzzleSolved) {
+        showTimeUpTroll();
+      }
+    }
+  }, 1000);
+}
+
+function showTimeUpTroll() {
+  document.getElementById("timeUpOptions").classList.remove("hidden");
+  document.getElementById("puzzleStatus").innerText = "സമയം കഴിഞ്ഞു!";
+}
+
+function giveExtraTime() {
+  document.getElementById("timeUpOptions").classList.add("hidden");
+  document.getElementById("puzzleStatus").innerText = "ശരി, 1 മിനിറ്റ് കൂടി തന്നു! വേഗം ചെയ്യ് 🔥";
+  timeLeft = 60;
+  startPuzzleTimer();
+}
+
+function autoSolvePuzzle() {
+  clearInterval(puzzleTimerInterval);
+  puzzleSolved = true;
+  document.getElementById("timeUpOptions").classList.add("hidden");
+  
+  board = [...winningBoard];
+  renderPuzzle(true);
+  
+  document.getElementById("puzzleStatus").innerText = "സാരമില്ല, ഞാൻ ശരിയാക്കി തന്നു! ഇനി മുന്നോട്ട് പോകാം ✨";
+  document.getElementById("puzzleNextBtn").classList.remove("hidden");
+  triggerConfetti();
+}
+
+function renderPuzzle(forceFull = false) {
   const container = document.getElementById("puzzleBoard");
   container.innerHTML = "";
 
@@ -72,31 +146,25 @@ function renderPuzzle() {
     const tile = document.createElement("div");
     tile.classList.add("tile");
 
-    if (val === 8) {
+    if (val === 8 && !forceFull) {
       tile.classList.add("empty");
     } else {
-      // Calculate background offset for 3x3
       const row = Math.floor(val / 3);
       const col = val % 3;
       tile.style.backgroundPosition = `-${col * 88}px -${row * 88}px`;
-      tile.addEventListener("click", () => swapTiles(idx));
+      if (!forceFull) {
+        tile.addEventListener("click", () => swapTiles(idx));
+      }
     }
     container.appendChild(tile);
   });
 
-  checkPuzzleWin();
+  if (!forceFull) checkPuzzleWin();
 }
 
 function swapTiles(idx) {
+  if (puzzleSolved) return;
   const emptyIdx = board.indexOf(8);
-  const validMoves = [
-    idx - 1, // Left
-    idx + 1, // Right
-    idx - 3, // Up
-    idx + 3  // Down
-  ];
-
-  // Prevent row wrapping jumps
   const isRowAdjacent = Math.floor(idx / 3) === Math.floor(emptyIdx / 3) && Math.abs(idx - emptyIdx) === 1;
   const isColAdjacent = Math.abs(idx - emptyIdx) === 3;
 
@@ -109,7 +177,11 @@ function swapTiles(idx) {
 function checkPuzzleWin() {
   const isSolved = board.every((val, idx) => val === winningBoard[idx]);
   if (isSolved) {
-    document.getElementById("puzzleStatus").innerText = "പൊളിച്ചു! പസിൽ പൂർത്തിയായി ✨";
+    puzzleSolved = true;
+    clearInterval(puzzleTimerInterval);
+    renderPuzzle(true);
+    document.getElementById("timeUpOptions").classList.add("hidden");
+    document.getElementById("puzzleStatus").innerText = "പൊളിച്ചു! സ്വന്തമായി തന്നെ സോൾവ് ചെയ്തു! 🎉";
     document.getElementById("puzzleNextBtn").classList.remove("hidden");
     triggerConfetti();
   }
@@ -140,7 +212,7 @@ function handleYesTrap() {
   goToLevel(4);
 }
 
-/* 5. LEVEL 4: SCRATCH CARD LOGIC */
+/* 5. LEVEL 4: SCRATCH CARD & CIPHER */
 let scratchInitialized = false;
 function initScratchCard() {
   if (scratchInitialized) return;
@@ -149,11 +221,9 @@ function initScratchCard() {
   const canvas = document.getElementById("scratchCanvas");
   const ctx = canvas.getContext("2d");
 
-  // Fill canvas with grey scratch cover
   ctx.fillStyle = "#9ca3af";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Add decorative label
   ctx.font = "16px sans-serif";
   ctx.fillStyle = "#374151";
   ctx.textAlign = "center";
@@ -172,7 +242,7 @@ function initScratchCard() {
 
     ctx.globalCompositeOperation = "destination-out";
     ctx.beginPath();
-    ctx.arc(x, y, 16, 0, Math.PI * 2);
+    ctx.arc(x, y, 18, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -201,7 +271,7 @@ function verifySecretCode() {
   }
 }
 
-/* 6. LEVEL 5: CAKE & CELEBRATION */
+/* 6. LEVEL 5: INTERACTIVE CAKE & CONFETTI */
 let candleBlown = false;
 function blowCandle() {
   if (candleBlown) return;
@@ -212,13 +282,15 @@ function blowCandle() {
 }
 
 function triggerConfetti() {
-  if (typeof confetti === "function") {
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-  }
+  try {
+    if (typeof confetti === "function") {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  } catch (e) {}
 }
 
 function celebrateAgain() {
